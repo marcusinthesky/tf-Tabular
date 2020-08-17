@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "tftabular"
+version = "0.1.0"
+description = "A flexible implementation of [TabNet](https://arxiv.org/pdf/1908.07442.pdf) in Tensorflow 2.0"
+authors = ["marcusinthesky <gwrmar002@myuct.ac.za>"]
+
+[tool.poetry.dependencies]
+python = "^3.8"
+tensorflow = "^2.2.0"
+tensorflow_addons = "^0.11.1"
+numpy = "^1.19.1"
+pandas = ">=0.25.1"
+pendulum = "^2.1.2"
+
+[tool.poetry.dev-dependencies]
+pytest = "^5.2"
+
+[build-system]
+requires = ["poetry>=0.12"]
+build-backend = "poetry.masonry.api"
