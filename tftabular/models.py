@@ -11,7 +11,7 @@ from .layers import TabNetDecoder, TabNetEncoder
 def identity(x):
     return x
 
-class TabNetClassifier(tf.keras.Model):
+class TabNetModel(tf.keras.Model):
     def __init__(
         self,
         outputs: int = 1,
@@ -22,10 +22,10 @@ class TabNetClassifier(tf.keras.Model):
         sparsity: float = 1e-5,
         feature_column: Optional[tf.keras.layers.DenseFeatures] = None,
         pretrained_encoder: Optional[tf.keras.layers.Layer] = None,
-        virtual_batch_size: Optional[int] = 128,
+        virtual_batch_size: Optional[int] = None,
         momentum: Optional[float] = 0.02,
     ):
-        super(TabNetClassifier, self).__init__()
+        super(TabNetModel, self).__init__()
 
         self.outputs = outputs
         self.n_steps = n_steps
@@ -62,17 +62,17 @@ class TabNetClassifier(tf.keras.Model):
         self, X: Union[tf.Tensor, np.ndarray], training: Optional[bool] = None
     ) -> Tuple[tf.Tensor]:
         X = self.feature(X)
-        output, encoded, importance = self.encoder(X)
+        prediction, encoded, importance = self.encoder(X)
 
-        prediction = tf.keras.activations.sigmoid(output)
         return prediction, encoded, importance
 
     def call(
         self, X: Union[tf.Tensor, np.ndarray], training: Optional[bool] = None
     ) -> tf.Tensor:
         prediction, _, _ = self.forward(X)
-        return prediction
 
+        return prediction
+                
     def transform(
         self, X: Union[tf.Tensor, np.ndarray], training: Optional[bool] = None
     ) -> tf.Tensor:
@@ -84,6 +84,21 @@ class TabNetClassifier(tf.keras.Model):
     ) -> tf.Tensor:
         _, _, importance = self.forward(X)
         return importance
+
+
+class TabNetClassifier(TabNetModel):
+    def call(
+        self, X: Union[tf.Tensor, np.ndarray], training: Optional[bool] = None
+    ) -> tf.Tensor:
+        prediction, _, _ = self.forward(X)
+
+        if self.outputs > 1:
+            return tf.keras.activations.softmax(prediction)
+        else:
+            return tf.keras.activations.sigmoid(prediction)
+
+class TabNetRegressor(TabNetModel):
+    pass
 
 
 class TabNetAutoencoder(tf.keras.Model):
