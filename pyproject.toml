@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "tftabular"
-version = "0.1.1"
+version = "0.1.2"
 description = "A flexible implementation of [TabNet](https://arxiv.org/pdf/1908.07442.pdf) in Tensorflow 2.0"
 authors = ["marcusinthesky <gwrmar002@myuct.ac.za>"]
 
