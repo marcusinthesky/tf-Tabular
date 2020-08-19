@@ -47,11 +47,13 @@ class FeatureTransformerBlock(tf.keras.layers.Layer):
         units: Optional[int] = None,
         virtual_batch_size: Optional[int] = 128,
         momentum: Optional[float] = 0.02,
+        skip: bool = False
     ):
         super(FeatureTransformerBlock, self).__init__()
         self.units = units
         self.virtual_batch_size = virtual_batch_size
         self.momentum = momentum
+        self.skip = skip
 
     def build(self, input_shape: tf.TensorShape):
         if self.units is None:
@@ -72,6 +74,10 @@ class FeatureTransformerBlock(tf.keras.layers.Layer):
         self, inputs: Union[tf.Tensor, np.ndarray], training: Optional[bool] = None
     ):
         initial = self.initial(inputs, training=training)
+
+        if self.skip:
+            initial = (initial + inputs) * np.sqrt(0.5)
+        
         residual = self.residual(initial, training=training)  # skip
 
         return (initial + residual) * np.sqrt(0.5)
@@ -130,6 +136,7 @@ class TabNetStep(tf.keras.layers.Layer):
             units=self.units,
             virtual_batch_size=self.virtual_batch_size,
             momentum=self.momentum,
+            skip=True
         )
         self.attention = AttentiveTransformer(
             units=input_shape[-1],
