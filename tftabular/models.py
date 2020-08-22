@@ -183,18 +183,9 @@ class TabNetAutoencoder(tf.keras.Model):
         T = X * (1 - M)
 
         # decode
-        reconstruction = self.decoder(encoded)
+        reconstruction = self.decoder(encoded) * (1 - M) + X * M
 
-        # loss
-        loss = tf.reduce_mean(
-            tf.where(
-                M != 0.0, tf.square(T - reconstruction), tf.zeros_like(reconstruction)
-            )
-        )
-
-        self.add_loss(loss)
-
-        return prediction
+        return reconstruction
 
     def transform(
         self, X: Union[tf.Tensor, np.ndarray], training: Optional[bool] = None
